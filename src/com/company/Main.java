@@ -23,12 +23,14 @@ public class Main implements Runnable {
     }
 
     Random rand = new Random();
-    public static String accessToken = "a6a22578-d1e2-3651-a97d-2c3c088c2799";
+    public static String accessToken = "385318b7-18c0-32b6-b492-93e43fbb82f2";
 public static final String deviceType="FreezerManager";
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
          ArrayList<String> devices=new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
-        String temp = getDevices();
+        String temp = getDevices(0,100);
+
+
         JsonObject jsonPayload = jsonParser.parse(temp).getAsJsonObject();
         JsonArray allDevices = jsonPayload.get("devices").getAsJsonArray();
         for (JsonElement device : allDevices) {
@@ -37,6 +39,15 @@ public static final String deviceType="FreezerManager";
                 devices.add(tempDevice.get("deviceIdentifier").getAsString());
             }
             }
+        String temp1=getDevices(101,100);
+        JsonObject jsonPayload1 = jsonParser.parse(temp1).getAsJsonObject();
+        JsonArray allDevices1 = jsonPayload1.get("devices").getAsJsonArray();
+        for (JsonElement device : allDevices1) {
+            JsonObject tempDevice = device.getAsJsonObject();
+            if((tempDevice.get("type").getAsString()).equals(deviceType)){
+                devices.add(tempDevice.get("deviceIdentifier").getAsString());
+            }
+        }
         System.out.println(devices.size());
         Thread newThread;
         for(int i=0;i<devices.size();i++){
@@ -73,9 +84,9 @@ public static final String deviceType="FreezerManager";
         }
     }
 
-    private static String getDevices() throws IOException {
+    private static String getDevices(int offset,int limit) throws IOException {
         StringBuffer result = new StringBuffer();
-        URL url = new URL("http://localhost:8280/api/device-mgt/v1.0/devices");
+        URL url = new URL("http://localhost:8280/api/device-mgt/v1.0/devices/?offset="+offset+"&limit="+limit);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty("authorization", " Bearer " + accessToken);
         conn.setRequestMethod("GET");
